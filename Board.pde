@@ -7,34 +7,33 @@ class Board {
   int winNeeded;
   int AIDepth;
   int[][] disks;
+  String currentPlayer;
 
-  void setupBoard(int boardSizeX_, int boardSizeY_, int winNeeded_, int AIDepth_) {
-    playerAI = new PlayerAI(AIDepth_);
-    playerHuman = new PlayerHuman();
-    
+  void setupBoard(int boardSizeX_, int boardSizeY_, int winNeeded_, int AIDepth_, String currentPlayer_) {
     boardSizeX = boardSizeX_;
     boardSizeY = boardSizeY_;
     winNeeded  = winNeeded_;
     AIDepth = AIDepth_;
     disks = new int[boardSizeX][boardSizeY];
-    
-    playerAI.scores = new float[disks.length];
+    currentPlayer = currentPlayer_;
+
+    playerAI = new PlayerAI();
+    playerHuman = new PlayerHuman();
   }
 
   int[][] winningLine = new int[2][2];
   float padding = 10;
   float cellSize;
-  String currentPlayer = "human";
   String gameState = "play";
   boolean showScores = false;
 
   void doNextMove() {
     if (gameState == "play") {
       if (currentPlayer == "ai") {
-        int[] move = playerAI.getMove(disks, winNeeded);
+        int[] move = playerAI.getMove();
         setMove(move[0], move[1]);
       } else if (currentPlayer == "human") {
-        int[] move = playerHuman.getMove(disks, cellSize);
+        int[] move = playerHuman.getMove();
         if (move[0] != -1) {
           setMove(move[0], move[1]);
         }
@@ -55,26 +54,18 @@ class Board {
       currentPlayer = "ai";
     }
 
-    gameState = checkLines(x, y, disks, winNeeded, currentPlayer, true);
-  }
-
-  void resetBoard() {
-    gameState = "play";
-    disks = new int[boardSizeX][boardSizeY];
-    currentPlayer = "human";
-    playerAI.depth = AIDepth;
-    playerAI.deltaTime = 1000;
+    gameState = checkLines(x, y, currentPlayer, true);
   }
 
   ArrayList<Integer> getPossibleMoves(int[][] disks) {
-    ArrayList<Integer> possibleMoves = new ArrayList<Integer>();
-    possibleMoves.clear();
-    for (int i = 0; i < disks.length; i++) {
+    ArrayList<Integer> pm = new ArrayList<Integer>();
+    for (int i = 0; i < boardSizeX; i++) {
       if (disks[i][0] == 0) {
-        possibleMoves.add(i);
+        pm.add(i);
       }
     }
-    return possibleMoves;
+    Collections.shuffle(pm);
+    return pm;
   }
 
   int getMinY(int[] column) {
@@ -86,17 +77,7 @@ class Board {
     return -1;
   }
 
-  boolean checkDuplicate(int x, int y) {
-    if (x < 0 || x >= boardSizeX || y < 0 || y >= boardSizeY) {
-      return false; // out of bounds
-    }
-    if (disks[x][y] != 0) {
-      return true; // duplicate
-    }
-    return false; // no duplicate
-  }
-
-  boolean checkDuplicate(int x, int y, int[][] disks, String currentPlayer) {
+  boolean checkDuplicate(int x, int y, String currentPlayer) {
     boardSizeX = disks.length;
     boardSizeY = disks[0].length;
 
@@ -109,14 +90,14 @@ class Board {
     return false; // no duplicate
   }
 
-  String checkLines(int x, int y, int[][] disks, int winNeeded, String currentPlayer, boolean realGame) {
+  String checkLines(int x, int y, String currentPlayer, boolean realGame) {
     boolean found;
 
     // check horizontal line
     for (int i = 0; i < winNeeded; i++) { 
       found = true; 
       for (int j = 0; j < winNeeded; j++) {
-        if (!checkDuplicate(x-i+j, y, disks, currentPlayer)) {
+        if (!checkDuplicate(x-i+j, y, currentPlayer)) {
           found = false;
           break;
         }
@@ -134,7 +115,7 @@ class Board {
     // check vertical line
     found = true; 
     for (int j = 0; j < winNeeded; j++) {
-      if (!checkDuplicate(x, y+j, disks, currentPlayer)) {
+      if (!checkDuplicate(x, y+j, currentPlayer)) {
         found = false;
         break;
       }
@@ -152,7 +133,7 @@ class Board {
     for (int i = 0; i < winNeeded; i++) { 
       found = true; 
       for (int j = 0; j < winNeeded; j++) {
-        if (!checkDuplicate(x-i+j, y-i+j, disks, currentPlayer)) {
+        if (!checkDuplicate(x-i+j, y-i+j, currentPlayer)) {
           found = false;
           break;
         }
@@ -171,7 +152,7 @@ class Board {
     for (int i = 0; i < winNeeded; i++) { 
       found = true; 
       for (int j = 0; j < winNeeded; j++) {
-        if (!checkDuplicate(x+i-j, y-i+j, disks, currentPlayer)) {
+        if (!checkDuplicate(x+i-j, y-i+j, currentPlayer)) {
           found = false;
           break;
         }
@@ -240,7 +221,7 @@ class Board {
     }
 
     if (currentPlayer == "human" && gameState == "play") {
-      playerHuman.draw(disks, cellSize);
+      playerHuman.draw();
     }
 
     // Show score values

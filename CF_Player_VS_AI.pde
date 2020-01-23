@@ -7,6 +7,15 @@
 // | * S -> Scores van AI per zet onderaan het bord weergeven          |
 // +-------------------------------------------------------------------+
 
+// Setup: -------------------------------------------------------------+
+int boardSizeX = 7; // Horizontale groote van het bord                 |
+int boardSizeY = 6; // Verticale groote van het bord                   |
+int winNeeded = 4; // Stukken nodig op een rij om te winnen            |
+int depth = 7; // Aantal zetten die AI vooruit denkt                   |
+String currentPlayer = "human"; // Beginnende speler                   |
+// +-------------------------------------------------------------------+
+
+
 import java.util.Collections;
 
 Board board = new Board();
@@ -15,7 +24,7 @@ PFont DIN;
 void setup() {
   size(640, 360);
   surface.setResizable(true);
-  board.setupBoard(7, 6, 4, 10); // 7 bij 6, 4-op-een-rij, 7 zetten vooruit denken {VERANDEREN}
+  board.setupBoard(boardSizeX, boardSizeY, winNeeded, depth, currentPlayer);
   DIN = createFont("DIN Bold_0.otf", 40);
   textFont(DIN);
 }
@@ -28,7 +37,8 @@ void draw() {
 void keyPressed() {
   switch (key) { 
   case 'r': // Reset
-    board.resetBoard();
+    board = new Board();
+    board.setupBoard(boardSizeX, boardSizeY, winNeeded, depth, currentPlayer);
     break;
   case 'p': // Print shown disks
     printDisks(board.disks);
