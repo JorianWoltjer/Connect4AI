@@ -1,6 +1,6 @@
 // Controls: ----------------------------------------------------------+
 // | * Links/Rechts -> Cursor verplaatsen                              |
-// | * Beneden -> Stuk plaatsen op cursor                              |
+// | * Beneden/Enter/Spatie -> Stuk plaatsen op cursor                 |
 // | * Muis -> Klikken om stuk te plaatsen op cursor                   |
 // | * R -> Reset bord                                                 |
 // | * P -> Print alle disks van het bord in de console                |
@@ -8,10 +8,10 @@
 // +-------------------------------------------------------------------+
 
 // Setup: -------------------------------------------------------------+
-int boardSizeX = 7; // Horizontale groote van het bord                 |
-int boardSizeY = 6; // Verticale groote van het bord                   |
+int sizeX = 7; // Horizontale groote van het bord                      |
+int sizeY = 6; // Verticale groote van het bord                        |
 int winNeeded = 4; // Stukken nodig op een rij om te winnen            |
-int depth = 7; // Aantal zetten die AI vooruit denkt                   |
+int AIDepth = 7; // Aantal zetten die de AI vooruit denkt              |
 String currentPlayer = "human"; // Beginnende speler                   |
 // +-------------------------------------------------------------------+
 
@@ -20,11 +20,13 @@ import java.util.Collections;
 
 Board board = new Board();
 PFont DIN;
+boolean pmousePressed = true;
+boolean pkeyPressed = true;
 
 void setup() {
   size(640, 360);
   surface.setResizable(true);
-  board.setupBoard(boardSizeX, boardSizeY, winNeeded, depth, currentPlayer);
+  board.setupBoard(sizeX, sizeY, winNeeded, AIDepth, currentPlayer);
   DIN = createFont("DIN Bold_0.otf", 40);
   textFont(DIN);
 }
@@ -32,13 +34,16 @@ void setup() {
 void draw() {
   board.doNextMove();
   board.draw();
+
+  pmousePressed = mousePressed;
+  pkeyPressed = keyPressed;
 }
 
 void keyPressed() {
   switch (key) { 
   case 'r': // Reset
     board = new Board();
-    board.setupBoard(boardSizeX, boardSizeY, winNeeded, depth, currentPlayer);
+    board.setupBoard(sizeX, sizeY, winNeeded, AIDepth, currentPlayer);
     break;
   case 'p': // Print shown disks
     printDisks(board.disks);

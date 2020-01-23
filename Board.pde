@@ -2,19 +2,19 @@ class Board {
 
   PlayerAI playerAI;
   PlayerHuman playerHuman;
-  int boardSizeX;
-  int boardSizeY;
+  int sizeX;
+  int sizeY;
   int winNeeded;
   int AIDepth;
   int[][] disks;
   String currentPlayer;
 
-  void setupBoard(int boardSizeX_, int boardSizeY_, int winNeeded_, int AIDepth_, String currentPlayer_) {
-    boardSizeX = boardSizeX_;
-    boardSizeY = boardSizeY_;
+  void setupBoard(int sizeX_, int sizeY_, int winNeeded_, int AIDepth_, String currentPlayer_) {
+    sizeX = sizeX_;
+    sizeY = sizeY_;
     winNeeded  = winNeeded_;
     AIDepth = AIDepth_;
-    disks = new int[boardSizeX][boardSizeY];
+    disks = new int[sizeX][sizeY];
     currentPlayer = currentPlayer_;
 
     playerAI = new PlayerAI();
@@ -44,22 +44,18 @@ class Board {
   void setMove(int x, int y) {
     if (currentPlayer == "ai") {
       disks[x][y] = 1;
+      currentPlayer = "human";
     } else { 
       disks[x][y] = 2;
-    }
-
-    if (currentPlayer == "ai") {
-      currentPlayer = "human";
-    } else {
       currentPlayer = "ai";
     }
 
-    gameState = checkLines(x, y, currentPlayer, true);
+    gameState = checkLines(x, y, true);
   }
 
   ArrayList<Integer> getPossibleMoves(int[][] disks) {
     ArrayList<Integer> pm = new ArrayList<Integer>();
-    for (int i = 0; i < boardSizeX; i++) {
+    for (int i = 0; i < sizeX; i++) {
       if (disks[i][0] == 0) {
         pm.add(i);
       }
@@ -77,11 +73,11 @@ class Board {
     return -1;
   }
 
-  boolean checkDuplicate(int x, int y, String currentPlayer) {
-    boardSizeX = disks.length;
-    boardSizeY = disks[0].length;
+  boolean checkDuplicate(int x, int y) {
+    sizeX = disks.length;
+    sizeY = disks[0].length;
 
-    if (x < 0 || x >= boardSizeX || y < 0 || y >= boardSizeY) {
+    if (x < 0 || x >= sizeX || y < 0 || y >= sizeY) {
       return false; // out of bounds
     }
     if ((currentPlayer == "human" && disks[x][y] == 1) || (currentPlayer == "ai" && disks[x][y] == 2)) {
@@ -90,14 +86,14 @@ class Board {
     return false; // no duplicate
   }
 
-  String checkLines(int x, int y, String currentPlayer, boolean realGame) {
+  String checkLines(int x, int y, boolean realGame) {
     boolean found;
 
     // check horizontal line
     for (int i = 0; i < winNeeded; i++) { 
       found = true; 
       for (int j = 0; j < winNeeded; j++) {
-        if (!checkDuplicate(x-i+j, y, currentPlayer)) {
+        if (!checkDuplicate(x-i+j, y)) {
           found = false;
           break;
         }
@@ -115,7 +111,7 @@ class Board {
     // check vertical line
     found = true; 
     for (int j = 0; j < winNeeded; j++) {
-      if (!checkDuplicate(x, y+j, currentPlayer)) {
+      if (!checkDuplicate(x, y+j)) {
         found = false;
         break;
       }
@@ -133,7 +129,7 @@ class Board {
     for (int i = 0; i < winNeeded; i++) { 
       found = true; 
       for (int j = 0; j < winNeeded; j++) {
-        if (!checkDuplicate(x-i+j, y-i+j, currentPlayer)) {
+        if (!checkDuplicate(x-i+j, y-i+j)) {
           found = false;
           break;
         }
@@ -152,7 +148,7 @@ class Board {
     for (int i = 0; i < winNeeded; i++) { 
       found = true; 
       for (int j = 0; j < winNeeded; j++) {
-        if (!checkDuplicate(x+i-j, y-i+j, currentPlayer)) {
+        if (!checkDuplicate(x+i-j, y-i+j)) {
           found = false;
           break;
         }
@@ -176,7 +172,7 @@ class Board {
         }
       }
     }
-    if (diskCount >= boardSizeX*boardSizeY) {
+    if (diskCount >= sizeX*sizeY) {
       return "tie";
     }
     return "play";
@@ -192,22 +188,22 @@ class Board {
     textSize(40);
 
     // Calculate sizes
-    cellSize = min((height-padding*2)/(boardSizeY+2), (width-padding*2)/(boardSizeX+2));
+    cellSize = min((height-padding*2)/(sizeY+2), (width-padding*2)/(sizeX+2));
 
     // Draw Grid
     strokeWeight(cellSize/10*0.75);
     stroke(255);
-    for (int i = 0; i < boardSizeX+1; i++) {
-      line(width/2-boardSizeX*0.5*cellSize+cellSize*i, height/2-boardSizeY*0.5*cellSize, width/2-boardSizeX*0.5*cellSize+cellSize*i, height/2-boardSizeY*0.5*cellSize+cellSize*boardSizeY);
+    for (int i = 0; i < sizeX+1; i++) {
+      line(width/2-sizeX*0.5*cellSize+cellSize*i, height/2-sizeY*0.5*cellSize, width/2-sizeX*0.5*cellSize+cellSize*i, height/2-sizeY*0.5*cellSize+cellSize*sizeY);
     }
-    for (int i = 0; i < boardSizeY+1; i++) {
-      line(width/2-boardSizeX*0.5*cellSize, height/2-boardSizeY*0.5*cellSize+cellSize*i, width/2-boardSizeX*0.5*cellSize+cellSize*boardSizeX, height/2-boardSizeY*0.5*cellSize+cellSize*i);
+    for (int i = 0; i < sizeY+1; i++) {
+      line(width/2-sizeX*0.5*cellSize, height/2-sizeY*0.5*cellSize+cellSize*i, width/2-sizeX*0.5*cellSize+cellSize*sizeX, height/2-sizeY*0.5*cellSize+cellSize*i);
     }
 
     // Draw all disks
     strokeWeight(cellSize/10*0.75);
-    for (int i = 0; i < boardSizeX; i++) {
-      for (int j = 0; j < boardSizeY; j++) {
+    for (int i = 0; i < sizeX; i++) {
+      for (int j = 0; j < sizeY; j++) {
         if (disks[i][j] == 1) {
           fill(playerAI.mainColor);
           stroke(playerAI.darkColor);
@@ -237,7 +233,7 @@ class Board {
         } else {
           fill(255);
         }
-        text(nf(playerAI.scores[i], 0, 1), gridToPoint(i, false)+cellSize/2, gridToPoint(boardSizeY, true)+cellSize/2);
+        text(nf(playerAI.scores[i], 0, 1), gridToPoint(i, false)+cellSize/2, gridToPoint(sizeY, true)+cellSize/2);
       }
       textAlign(CENTER, TOP);
     }
@@ -265,9 +261,9 @@ class Board {
 
   float gridToPoint(int n, boolean isY) {
     if (isY) 
-      return height/2-boardSizeY*0.5*cellSize+cellSize*n;
+      return height/2-sizeY*0.5*cellSize+cellSize*n;
     else
-      return width/2-boardSizeX*0.5*cellSize+cellSize*n;
+      return width/2-sizeX*0.5*cellSize+cellSize*n;
   }
 
   float gridToPoint(float n, boolean isY, int[][] board, float cellSize) {
