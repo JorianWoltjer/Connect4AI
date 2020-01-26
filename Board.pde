@@ -7,9 +7,9 @@ class Board {
   int winNeeded;
   int AIDepth;
   int[][] disks;
-  String currentPlayer;
+  int currentPlayer;
 
-  void setupBoard(int sizeX_, int sizeY_, int winNeeded_, int AIDepth_, String currentPlayer_) {
+  void setupBoard(int sizeX_, int sizeY_, int winNeeded_, int AIDepth_, int currentPlayer_) {
     sizeX = sizeX_;
     sizeY = sizeY_;
     winNeeded  = winNeeded_;
@@ -21,18 +21,27 @@ class Board {
     playerHuman = new PlayerHuman();
   }
 
+  int gameState = 0; // 0=play, 1=win, 2=tie
   int[][] winningLine = new int[2][2];
   float padding = 10;
   float cellSize;
-  String gameState = "play";
   boolean showScores = false;
 
   void doNextMove() {
-    if (gameState == "play") {
-      if (currentPlayer == "ai") {
+    if (gameState == 0) {
+      if (currentPlayer == 2) {
         int[] move = playerAI.getMove();
         setMove(move[0], move[1]);
-      } else if (currentPlayer == "human") {
+        for (int i = 0; i < playerAI.scores.length; i++) {
+          if (playerAI.scores[i] > 0) {
+            println("AI will win");
+            break;
+          }
+        }
+        if (AIDepth >= sizeX*sizeY-getDiskCount()) {
+          println("AI will play perfectly");
+        }
+      } else if (currentPlayer == 1) {
         int[] move = playerHuman.getMove();
         if (move[0] != -1) {
           setMove(move[0], move[1]);
@@ -42,18 +51,12 @@ class Board {
   }
 
   void setMove(int x, int y) {
-    if (currentPlayer == "ai") {
-      disks[x][y] = 1;
-      currentPlayer = "human";
-    } else { 
-      disks[x][y] = 2;
-      currentPlayer = "ai";
-    }
-
+    disks[x][y] = currentPlayer;
     gameState = checkLines(x, y, true);
+    currentPlayer = currentPlayer % 2 + 1;
   }
 
-  ArrayList<Integer> getPossibleMoves(int[][] disks) {
+  ArrayList<Integer> getPossibleMoves() {
     ArrayList<Integer> pm = new ArrayList<Integer>();
     for (int i = 0; i < sizeX; i++) {
       if (disks[i][0] == 0) {
@@ -62,6 +65,18 @@ class Board {
     }
     Collections.shuffle(pm);
     return pm;
+  }
+
+  int getDiskCount() {
+    int diskCount = 0;
+    for (int i = 0; i < disks.length; i++) {
+      for (int j = 0; j < disks[0].length; j++) {
+        if (disks[i][j] != 0) {
+          diskCount++;
+        }
+      }
+    }
+    return diskCount;
   }
 
   int getMinY(int[] column) {
@@ -74,19 +89,16 @@ class Board {
   }
 
   boolean checkDuplicate(int x, int y) {
-    sizeX = disks.length;
-    sizeY = disks[0].length;
-
     if (x < 0 || x >= sizeX || y < 0 || y >= sizeY) {
       return false; // out of bounds
     }
-    if ((currentPlayer == "human" && disks[x][y] == 1) || (currentPlayer == "ai" && disks[x][y] == 2)) {
+    if (disks[x][y] == currentPlayer) {
       return true; // duplicate
     }
     return false; // no duplicate
   }
 
-  String checkLines(int x, int y, boolean realGame) {
+  int checkLines(int x, int y, boolean realGame) {
     boolean found;
 
     // check horizontal line
@@ -105,7 +117,7 @@ class Board {
           winningLine[1][0] = x-i+winNeeded-1;
           winningLine[1][1] = y;
         }
-        return "win";
+        return 1;
       }
     }
     // check vertical line
@@ -123,7 +135,7 @@ class Board {
         winningLine[1][0] = x;
         winningLine[1][1] = y+winNeeded-1;
       }
-      return "win";
+      return 1;
     }
     // check diagonal tl-br line
     for (int i = 0; i < winNeeded; i++) { 
@@ -141,7 +153,7 @@ class Board {
           winningLine[1][0] = x-i+winNeeded-1;
           winningLine[1][1] = y-i+winNeeded-1;
         }
-        return "win";
+        return 1;
       }
     }
     // check diagonal tr-bl line
@@ -160,22 +172,15 @@ class Board {
           winningLine[1][0] = x+i-winNeeded+1;
           winningLine[1][1] = y-i+winNeeded-1;
         }
-        return "win";
+        return 1;
       }
     }
+
     // check for tie
-    int diskCount = 0;
-    for (int i = 0; i < disks.length; i++) {
-      for (int j = 0; j < disks[0].length; j++) {
-        if (disks[i][j] != 0) {
-          diskCount++;
-        }
-      }
+    if (getDiskCount() >= sizeX*sizeY) {
+      return 2;
     }
-    if (diskCount >= sizeX*sizeY) {
-      return "tie";
-    }
-    return "play";
+    return 0;
   }
 
 
@@ -204,11 +209,11 @@ class Board {
     strokeWeight(cellSize/10*0.75);
     for (int i = 0; i < sizeX; i++) {
       for (int j = 0; j < sizeY; j++) {
-        if (disks[i][j] == 1) {
+        if (disks[i][j] == 2) {
           fill(playerAI.mainColor);
           stroke(playerAI.darkColor);
           ellipse(gridToPoint(i, false)+cellSize/10, gridToPoint(j, true)+cellSize/10, cellSize-cellSize/10*2, cellSize-cellSize/10*2);
-        } else if (disks[i][j] == 2) {
+        } else if (disks[i][j] == 1) {
           fill(playerHuman.mainColor);
           stroke(playerHuman.darkColor);
           ellipse(gridToPoint(i, false)+cellSize/10, gridToPoint(j, true)+cellSize/10, cellSize-cellSize/10*2, cellSize-cellSize/10*2);
@@ -216,7 +221,7 @@ class Board {
       }
     }
 
-    if (currentPlayer == "human" && gameState == "play") {
+    if (currentPlayer == 1 && gameState == 0) {
       playerHuman.draw();
     }
 
@@ -239,11 +244,11 @@ class Board {
     }
 
     // End screen
-    if (gameState == "win") {
-      textAlign(CENTER, CENTER);
-      textSize(cellSize*0.7);
-      noStroke();
-      if (currentPlayer == "ai") {
+    textAlign(CENTER, CENTER);
+    textSize(cellSize*0.7);
+    noStroke();
+    if (gameState == 1) {
+      if (currentPlayer == 2) {
         fill(playerHuman.mainColor);
         text("Human Player Wins!", width/2, gridToPoint(-1, true)+cellSize/2);
       } else {
@@ -253,9 +258,9 @@ class Board {
       stroke(255);
       line(gridToPoint(winningLine[0][0], false)+cellSize/2, gridToPoint(winningLine[0][1], true)+cellSize/2, 
         gridToPoint(winningLine[1][0], false)+cellSize/2, gridToPoint(winningLine[1][1], true)+cellSize/2);
-    } else if (gameState == "tie") {
+    } else if (gameState == 2) {
       fill(255);
-      text("Tie Game!", width/2, padding/10);
+      text("Tie Game!", width/2, gridToPoint(-1, true)+cellSize/2);
     }
   }
 

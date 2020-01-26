@@ -8,7 +8,7 @@ class PlayerHuman {
   ArrayList<Integer> possibleMoves = new ArrayList<Integer>();
 
   int[] getMove() {
-    ArrayList<Integer> possibleMoves = board.getPossibleMoves(board.disks);
+    ArrayList<Integer> possibleMoves = board.getPossibleMoves();
     int[] move = new int[] {-1, -1};
 
     if (mousePressed && !pmousePressed) {
@@ -20,14 +20,8 @@ class PlayerHuman {
           }
         }
       }
-    } else if (keyPressed && !pkeyPressed) {
-      if ((key == CODED && keyCode == DOWN) || key == ' ' || key == 10) {
-        if (possibleMoves.contains(selectedSlot)) {
-          move[0] = selectedSlot;
-          move[1] = board.getMinY(board.disks[selectedSlot]);
-        }
-      } else if (possibleMoves.contains(key-49)) {
-        selectedSlot = key-49;
+    } else if (keyPressed && !pkeyPressed && ((key == CODED && keyCode == DOWN) || key == ' ' || key == 10)) {
+      if (possibleMoves.contains(selectedSlot)) {
         move[0] = selectedSlot;
         move[1] = board.getMinY(board.disks[selectedSlot]);
       }
@@ -36,14 +30,10 @@ class PlayerHuman {
   }
 
   void draw() {
-    ArrayList<Integer> possibleMoves = board.getPossibleMoves(board.disks);
-
     // Hover disk
     for (int x = 0; x < board.sizeX; x++) {
       if (mouseX > board.gridToPoint(x, false) && mouseX < board.gridToPoint(x+1, false) && mouseY < board.gridToPoint(board.sizeY, true)) {
-        if (possibleMoves.contains(x)) {
-          selectedSlot = x;
-        }
+        selectedSlot = x;
       }
     }
     if (keyPressed && !pkeyPressed && key == CODED) {
