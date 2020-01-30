@@ -1,8 +1,10 @@
 class PlayerHuman {
-  color mainColor = color(231, 76, 60);
-  color darkColor = color(216, 61, 45);
-  color mainHoverColor = color(121, 60, 54);
-  color darkHoverColor = color(115, 54, 48);
+  
+  color mainColor = color(231, 76, 60); // Red
+  //color mainColor = color(241, 196, 15); // DAF Yellow
+  color darkColor = color(red(mainColor)-15, green(mainColor)-15, blue(mainColor)-15);
+  color mainHoverColor = color(sqrt(red(mainColor)-15)*8, sqrt(green(mainColor)-15)*8, sqrt(blue(mainColor)-15)*8);
+  color darkHoverColor = color(sqrt(red(mainColor)-15)*8-6, sqrt(green(mainColor)-15)*8-6, sqrt(blue(mainColor)-15)*8-6);
 
   int selectedSlot = (board.sizeX-1)/2;
   ArrayList<Integer> possibleMoves = new ArrayList<Integer>();

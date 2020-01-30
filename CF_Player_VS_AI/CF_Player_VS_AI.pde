@@ -8,8 +8,8 @@
 // +-------------------------------------------------------------------+
 
 // Setup: -------------------------------------------------------------+
-int sizeX = 4; // Horizontale groote van het bord                      |
-int sizeY = 4; // Verticale groote van het bord                        |
+int sizeX = 7; // Horizontale groote van het bord                      |
+int sizeY = 6; // Verticale groote van het bord                        |
 int winNeeded = 4; // Stukken nodig op een rij om te winnen            |
 int AIDepth = 7; // Aantal zetten die de AI vooruit denkt              |
 int currentPlayer = 1; // Beginnende speler (1=Human, 2=AI)            |
@@ -24,6 +24,7 @@ boolean pkeyPressed = true;
 
 void setup() {
   size(640, 360);
+  background(50);
   surface.setResizable(true);
   board.setupBoard(sizeX, sizeY, winNeeded, AIDepth, currentPlayer);
   DIN = createFont("DIN Bold_0.otf", 40);

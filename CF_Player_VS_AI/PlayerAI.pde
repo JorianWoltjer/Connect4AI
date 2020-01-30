@@ -1,6 +1,8 @@
 class PlayerAI {
-  color mainColor = color(52, 152, 219);
-  color darkColor = color(32, 132, 199);
+  
+  color mainColor = color(52, 152, 219); // Blue
+  //color mainColor = color(142, 68, 173); // DAF Purple
+  color darkColor = color(red(mainColor)-15, green(mainColor)-15, blue(mainColor)-15);
 
   float[] scores = new float[board.sizeX];
   int lastTime = 0;
