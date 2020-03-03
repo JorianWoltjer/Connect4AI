@@ -1,5 +1,5 @@
 class PlayerAI {
-  
+
   color mainColor = color(52, 152, 219); // Blue
   //color mainColor = color(142, 68, 173); // DAF Purple
   color darkColor = color(red(mainColor)-15, green(mainColor)-15, blue(mainColor)-15);
@@ -30,7 +30,7 @@ class PlayerAI {
       int y = board.getMinY(board.disks[x]);
       board.disks[x][y] = 2;
       board.currentPlayer = 2;
-      float score = minimax(x, y, board.AIDepth, false);
+      float score = minimax(x, y, board.AIDepth, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, false);
       board.disks[x][y] = 0;
       board.currentPlayer = 2;
       if (score > bestScore) {
@@ -47,7 +47,7 @@ class PlayerAI {
     //return possibleMoves.get(int(random(0, possibleMoves.size())));
   }
 
-  float minimax(int x, int y, int AIDepth_, boolean isMaximizing) {
+  float minimax(int x, int y, int AIDepth_, float alpha, float beta, boolean isMaximizing) {
     int result = board.checkLines(x, y, false); // 0=play, 1=win, 2=tie
 
     if (AIDepth_ == 0) {
@@ -74,10 +74,14 @@ class PlayerAI {
         int y_ = board.getMinY(board.disks[x_]);
         board.disks[x_][y_] = 2;
         board.currentPlayer = 2;
-        float score = minimax(x_, y_, AIDepth_-1, false);
+        float score = minimax(x_, y_, AIDepth_-1, alpha, beta, false);
         board.disks[x_][y_] = 0;
         board.currentPlayer = 2;
         bestScore = max(score, bestScore);
+        alpha = max(alpha, score);
+        if (beta <= alpha) {
+          break;
+        }
       }
       return bestScore;
     } else {
@@ -89,10 +93,14 @@ class PlayerAI {
         int y_ = board.getMinY(board.disks[x_]);
         board.disks[x_][y_] = 1;
         board.currentPlayer = 1;
-        float score = minimax(x_, y_, AIDepth_-1, true);
+        float score = minimax(x_, y_, AIDepth_-1, alpha, beta, true);
         board.disks[x_][y_] = 0;
         board.currentPlayer = 1;
         bestScore = min(score, bestScore);
+        beta = min(beta, score);
+        if (beta <= alpha) {
+          break;
+        }
       }
       return bestScore;
     }

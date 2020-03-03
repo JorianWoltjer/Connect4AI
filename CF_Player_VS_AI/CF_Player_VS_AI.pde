@@ -11,7 +11,7 @@
 int sizeX = 7; // Horizontale groote van het bord                      |
 int sizeY = 6; // Verticale groote van het bord                        |
 int winNeeded = 4; // Stukken nodig op een rij om te winnen            |
-int AIDepth = 7; // Aantal zetten die de AI vooruit denkt              |
+int AIDepth = 8; // Aantal zetten die de AI vooruit denkt              |
 int currentPlayer = 1; // Beginnende speler (1=Human, 2=AI)            |
 // +-------------------------------------------------------------------+
 
@@ -32,7 +32,9 @@ void setup() {
   background(50);
   surface.setResizable(true);
 
-  arduinoPort = new Serial(this, Serial.list()[1], 9600);
+  if (Serial.list().length > 0) {
+    arduinoPort = new Serial(this, Serial.list()[Serial.list().length-1], 9600);
+  }
   board.setupBoard(sizeX, sizeY, winNeeded, AIDepth, currentPlayer);
   DIN = createFont("DIN Bold_0.otf", 40);
   textFont(DIN);
