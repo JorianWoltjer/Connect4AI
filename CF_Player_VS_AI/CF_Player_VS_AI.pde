@@ -16,6 +16,11 @@ int currentPlayer = 1; // Beginnende speler (1=Human, 2=AI)            |
 // +-------------------------------------------------------------------+
 
 import java.util.Collections;
+import processing.serial.*;
+
+Serial arduinoPort;  // Create object from Serial class
+String arduinoVal = "";   // Data received from the serial port
+String pArduinoVal = "";
 
 Board board = new Board();
 PFont DIN;
@@ -26,15 +31,22 @@ void setup() {
   size(640, 360);
   background(50);
   surface.setResizable(true);
+
+  arduinoPort = new Serial(this, Serial.list()[1], 9600);
   board.setupBoard(sizeX, sizeY, winNeeded, AIDepth, currentPlayer);
   DIN = createFont("DIN Bold_0.otf", 40);
   textFont(DIN);
 }
 
 void draw() {
+  if (arduinoPort.available() > 0) {
+    arduinoVal = arduinoPort.readString().trim();
+  } 
+
   board.doNextMove();
   board.draw();
 
+  pArduinoVal = arduinoVal;
   pmousePressed = mousePressed;
   pkeyPressed = keyPressed;
 }

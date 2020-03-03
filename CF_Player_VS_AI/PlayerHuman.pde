@@ -27,6 +27,11 @@ class PlayerHuman {
         move[0] = selectedSlot;
         move[1] = board.getMinY(board.disks[selectedSlot]);
       }
+    } else if (arduinoVal.equals("down") && pArduinoVal.equals("")) {
+      if (possibleMoves.contains(selectedSlot)) {
+        move[0] = selectedSlot;
+        move[1] = board.getMinY(board.disks[selectedSlot]);
+      }
     }
     return move;
   }
@@ -38,12 +43,12 @@ class PlayerHuman {
         selectedSlot = x;
       }
     }
-    if (keyPressed && !pkeyPressed && key == CODED) {
-      if (keyCode == LEFT) {
+    if ((keyPressed && !pkeyPressed && key == CODED) || pArduinoVal.equals("")) {
+      if (keyCode == LEFT || arduinoVal.equals("left")) {
         if (selectedSlot > 0) {
           selectedSlot--;
         }
-      } else if (keyCode == RIGHT) {
+      } else if (keyCode == RIGHT || arduinoVal.equals("right")) {
         if (selectedSlot < board.sizeX-1) {
           selectedSlot++;
         }

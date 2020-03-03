@@ -32,15 +32,6 @@ class Board {
       if (currentPlayer == 2) {
         int[] move = playerAI.getMove();
         setMove(move[0], move[1]);
-        for (int i = 0; i < playerAI.scores.length; i++) {
-          if (playerAI.scores[i] > 0) {
-            println("AI will win");
-            break;
-          }
-        }
-        if (AIDepth >= sizeX*sizeY-getDiskCount()) {
-          println("AI will play perfectly");
-        }
       } else if (currentPlayer == 1) {
         int[] move = playerHuman.getMove();
         if (move[0] != -1) {
