@@ -27,7 +27,7 @@ class PlayerHuman {
         move[0] = selectedSlot;
         move[1] = board.getMinY(board.disks[selectedSlot]);
       }
-    } else if (arduinoVal.equals("down") && pArduinoVal.equals("")) {
+    } else if (arduinoVal.equals("down") && pArduinoVal.equals("none")) {
       if (possibleMoves.contains(selectedSlot)) {
         move[0] = selectedSlot;
         move[1] = board.getMinY(board.disks[selectedSlot]);
@@ -37,13 +37,7 @@ class PlayerHuman {
   }
 
   void draw() {
-    // Hover disk
-    for (int x = 0; x < board.sizeX; x++) {
-      if (mouseX > board.gridToPoint(x, false) && mouseX < board.gridToPoint(x+1, false) && mouseY < board.gridToPoint(board.sizeY, true)) {
-        selectedSlot = x;
-      }
-    }
-    if ((keyPressed && !pkeyPressed && key == CODED) || pArduinoVal.equals("")) {
+    if ((keyPressed && !pkeyPressed && key == CODED) || pArduinoVal.equals("none")) {
       if (keyCode == LEFT || arduinoVal.equals("left")) {
         if (selectedSlot > 0) {
           selectedSlot--;
@@ -52,6 +46,12 @@ class PlayerHuman {
         if (selectedSlot < board.sizeX-1) {
           selectedSlot++;
         }
+      }
+    }
+    // Hover disk
+    for (int x = 0; x < board.sizeX; x++) {
+      if (mouseX > board.gridToPoint(x, false) && mouseX < board.gridToPoint(x+1, false) && mouseY < board.gridToPoint(board.sizeY, true)) {
+        selectedSlot = x;
       }
     }
 
