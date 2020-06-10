@@ -41,7 +41,7 @@ void setup() {
 }
 
 void draw() {
-  if (arduinoPort.available() > 0) {
+  if (arduinoPort != null && arduinoPort.available() > 0) {
     arduinoVal = arduinoPort.readString().trim();
   } 
 
